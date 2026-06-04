@@ -1,0 +1,12 @@
+{
+    "docker": {
+        "enabled": true,
+        "privileged": false,
+        "capabilities": [],
+        "devices": ["/dev/dri"],
+        "network_mode": "host"
+    },
+    "filesystem": {
+        "read_write_paths": ["/var/apps/App.ThirdParty.HandBrakeWebui/var"]
+    }
+}

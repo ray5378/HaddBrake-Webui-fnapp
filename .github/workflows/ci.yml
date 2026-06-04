@@ -1,0 +1,93 @@
+name: Code Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          npm ci --ignore-scripts
+
+      - name: Run Backend Linting
+        run: |
+          cd backend
+          ./node_modules/.bin/eslint . --ext .ts --format stylish
+
+      - name: Check Backend Formatting
+        run: |
+          cd backend
+          ./node_modules/.bin/prettier --check 'src/**/*.ts' '*.ts'
+
+      - name: Backend Type Check
+        run: |
+          cd backend
+          npx tsc --noEmit
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run Frontend Linting
+        run: |
+          cd frontend
+          ./node_modules/.bin/eslint src/ --ext .ts,.tsx --format stylish
+
+      - name: Check Frontend Hardcoded Text
+        run: |
+          cd frontend
+          node scripts/check-hardcoded-text.js
+
+      - name: Check Frontend i18n Key Completeness
+        run: |
+          cd frontend
+          node scripts/check-i18n-keys.js
+
+      - name: Check Frontend Formatting
+        run: |
+          cd frontend
+          ./node_modules/.bin/prettier --check 'src/**/*.{ts,tsx}'
+
+      - name: Frontend Type Check
+        run: |
+          cd frontend
+          npx tsc --noEmit
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: Install Backend Dependencies & Build
+        run: |
+          cd backend
+          npm ci
+          npm run build

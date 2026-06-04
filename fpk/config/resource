@@ -1,0 +1,16 @@
+{
+    "cpu": {
+        "shares": 1024,
+        "cfs_period_us": 100000,
+        "cfs_quota_us": 0
+    },
+    "memory": {
+        "limit": 0,
+        "reservation": 1024,
+        "swap": 0
+    },
+    "io": {
+        "read_bps": 0,
+        "write_bps": 0
+    }
+}

@@ -70,8 +70,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ matrix.registry == 'dockerhub' && format('{0}/{1}', secrets.DOCKERHUB_USERNAME, 'handbrake-webui') || '' }}
-            ${{ matrix.registry == 'ghcr' && format('ghcr.io/{0}/{1}', github.repository_owner, 'handbrake-webui') || '' }}
+            ${{ matrix.registry == 'dockerhub' && format('{0}/{1}', secrets.DOCKERHUB_USERNAME, 'handbrake-webui-fnapp') || '' }}
+            ${{ matrix.registry == 'ghcr' && format('ghcr.io/{0}/{1}', github.repository_owner, 'handbrake-webui-fnapp') || '' }}
           tags: |
             type:ref,event=branch
             type:ref,event=pr

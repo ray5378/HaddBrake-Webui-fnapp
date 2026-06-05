@@ -48,7 +48,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/handbrake-webui
+            ${{ secrets.DOCKERHUB_USERNAME }}/handbrake-webui-fnapp
           tags: |
             type:ref,event=branch
             type:ref,event=pr

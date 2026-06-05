@@ -18,7 +18,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     cat > "$CONFIG_FILE" << 'EOFCONF'
 # HandBrake-Webui fpk 持久化配置
 # 此文件由生命周期脚本自动管理
-install_version=1.0.0
+install_version=1.0.1
 keep_data_on_uninstall=true
 keep_image_on_uninstall=false
 drive_path=

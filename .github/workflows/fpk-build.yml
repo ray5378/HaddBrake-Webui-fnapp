@@ -52,17 +52,22 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: src
-          file: src/docker/Dockerfile
+          file: docker/Dockerfile
           tags: ray5378/handbrake-webui-fnapp:latest
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
 
+      - name: Verify Docker image exists
+        run: |
+          docker image inspect ray5378/handbrake-webui-fnapp:latest > /dev/null || { echo "Docker image not found!"; exit 1; }
+
       - name: Save Docker image as tarball
         run: |
           mkdir -p fnapp/fpk/docker
           docker save ray5378/handbrake-webui-fnapp:latest | gzip > fnapp/fpk/docker/image.tar.gz
+          ls -lh fnapp/fpk/docker/image.tar.gz
 
       - name: Package app.tgz
         run: |
@@ -93,6 +98,11 @@ jobs:
             fpk/wizard/install \
             fpk/wizard/uninstall
           mv "${FPK_NAME}" ../
+
+      - name: Verify fpk contents
+        run: |
+          ls -lh App.ThirdParty.HandBrakeWebui-*.fpk
+          tar -tzf App.ThirdParty.HandBrakeWebui-*.fpk
 
       - name: Generate checksum
         run: |

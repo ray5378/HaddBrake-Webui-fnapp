@@ -14,16 +14,8 @@ jobs:
     name: Build fpk
 
     steps:
-      - name: Checkout fpk packaging repo
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          path: fnapp
-
-      - name: Checkout HandBrake-Webui source
-        uses: actions/checkout@v4
-        with:
-          repository: ray5378/HandBrake-Webui
-          path: src
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -52,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: src
-          file: docker/Dockerfile
+          file: src/docker/Dockerfile
           tags: ray5378/handbrake-webui-fnapp:latest
           load: true
           cache-from: type=gha
@@ -65,17 +57,16 @@ jobs:
 
       - name: Save Docker image as tarball
         run: |
-          mkdir -p fnapp/fpk/docker
-          docker save ray5378/handbrake-webui-fnapp:latest | gzip > fnapp/fpk/docker/image.tar.gz
-          ls -lh fnapp/fpk/docker/image.tar.gz
+          mkdir -p fpk/docker
+          docker save ray5378/handbrake-webui-fnapp:latest | gzip > fpk/docker/image.tar.gz
+          ls -lh fpk/docker/image.tar.gz
 
       - name: Package app.tgz
         run: |
-          tar -czf fnapp/fpk/app.tgz -C fnapp/fpk/app .
+          tar -czf fpk/app.tgz -C fpk/app .
 
       - name: Build fpk
         run: |
-          cd fnapp
           FPK_NAME="App.ThirdParty.HandBrakeWebui-1.0.3.fpk"
           tar -czf "${FPK_NAME}" \
             --transform 's|^fpk/||' \
@@ -97,7 +88,6 @@ jobs:
             fpk/config/resource \
             fpk/wizard/install \
             fpk/wizard/uninstall
-          mv "${FPK_NAME}" ../
 
       - name: Verify fpk contents
         run: |

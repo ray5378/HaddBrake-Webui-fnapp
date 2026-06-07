@@ -1,55 +1,25 @@
 #!/bin/bash
 
-find_compose_file() {
-  for c in "${TRIM_APPDEST}/docker/docker-compose.yaml" \
-           "${TRIM_APPDEST}/target/docker/docker-compose.yaml"; do
-    if [ -f "$c" ]; then
-      echo "$c"
-      return 0
-    fi
-  done
-  return 1
-}
-
-inject_drive_volume() {
-  local compose_file="$1"
-  local path="$2"
-  [ ! -f "$compose_file" ] && return 1
-
-  # Save path for upgrade persistence
+save_drive_path() {
+  local path="$1"
   if [ -n "$path" ]; then
     mkdir -p "${TRIM_PKGVAR}" 2>/dev/null || true
     echo "$path" > "${TRIM_PKGVAR}/drive_path" 2>/dev/null || true
   fi
-
-  # Remove existing /drive/ volumes
-  sed -i '\|^      - .*:/drive|d' "$compose_file" 2>/dev/null || true
-
-  [ -z "$path" ] && return 0
-
-  sed -i "/^    volumes:/a\\      - ${path}:/drive" "$compose_file"
 }
 
-COMPOSE_FILE=$(find_compose_file)
-if [ -z "$COMPOSE_FILE" ]; then
-  echo "docker-compose.yaml not found, volumes will not be injected" >&2
-else
-  local_path="${drive_path}"
-  if [ -z "$local_path" ] && [ -f "${TRIM_PKGVAR}/drive_path" ]; then
-    local_path=$(cat "${TRIM_PKGVAR}/drive_path")
-  fi
-  if [ -z "$local_path" ] && [ -n "${TRIM_DATA_SHARE_PATHS}" ]; then
-    local_path="${TRIM_DATA_SHARE_PATHS%%:*}"
-  fi
-  inject_drive_volume "$COMPOSE_FILE" "$local_path"
+local_path="${drive_path}"
+if [ -z "$local_path" ] && [ -f "${TRIM_PKGVAR}/drive_path" ]; then
+  local_path=$(cat "${TRIM_PKGVAR}/drive_path")
+fi
+if [ -z "$local_path" ] && [ -n "${TRIM_DATA_SHARE_PATHS}" ]; then
+  local_path="${TRIM_DATA_SHARE_PATHS%%:*}"
 fi
 
-# Recreate container: stop/rm by name avoids compose project-name mismatch
-CF=$(readlink -f "$COMPOSE_FILE")
-if command -v docker &>/dev/null && [ -n "$COMPOSE_FILE" ]; then
-  docker stop handbrake-webui 2>/dev/null || true
-  docker rm handbrake-webui 2>/dev/null || true
-  docker compose -f "$CF" up -d
-fi
+save_drive_path "$local_path"
+
+CMD_DIR="$(dirname "$0")"
+"${CMD_DIR}/main" stop
+"${CMD_DIR}/main" start
 
 exit 0

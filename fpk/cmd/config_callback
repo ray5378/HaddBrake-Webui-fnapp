@@ -44,10 +44,12 @@ else
   inject_drive_volume "$COMPOSE_FILE" "$local_path"
 fi
 
-# Recreate container to apply new volume mounts
+# Recreate container: stop/rm by name avoids compose project-name mismatch
+CF=$(readlink -f "$COMPOSE_FILE")
 if command -v docker &>/dev/null && [ -n "$COMPOSE_FILE" ]; then
-  CF=$(readlink -f "$COMPOSE_FILE")
-  docker compose -f "$CF" up -d --force-recreate >/dev/null 2>&1 || true
+  docker stop handbrake-webui 2>/dev/null || true
+  docker rm handbrake-webui 2>/dev/null || true
+  docker compose -f "$CF" up -d
 fi
 
 exit 0

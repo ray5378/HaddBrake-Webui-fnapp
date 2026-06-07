@@ -6,7 +6,6 @@ services:
     network_mode: host
     volumes:
       - ${TRIM_PKGVAR}/config:/config
-      - ${drive_path:-/vol1}:/drive
     environment:
       - PORT=${TRIM_SERVICE_PORT}
       - CONFIG_DIR=/config

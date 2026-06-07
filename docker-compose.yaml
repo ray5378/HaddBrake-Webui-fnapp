@@ -8,5 +8,8 @@ services:
     volumes:
       - ./config:/config
       - /path/to/your/media:/drive
+    environment:
+      - PORT=52389
+      - CONFIG_DIR=/config
     devices:
       - /dev/dri:/dev/dri

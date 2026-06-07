@@ -3,9 +3,6 @@
 IMAGE_NAME="ray5378/handbrake-webui-fnapp:latest"
 
 load_docker_image() {
-  if docker image inspect "${IMAGE_NAME}" &>/dev/null; then
-    return 0
-  fi
   docker pull "${IMAGE_NAME}" || {
     echo "Failed to pull image ${IMAGE_NAME}" >&2
     return 1

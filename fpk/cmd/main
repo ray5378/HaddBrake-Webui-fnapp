@@ -21,6 +21,7 @@ start_container() {
     --name handbrake-webui \
     --restart unless-stopped \
     --network host \
+    --pull always \
     $vol_config \
     -e PORT="${TRIM_SERVICE_PORT:-52389}" \
     -e CONFIG_DIR=/config \

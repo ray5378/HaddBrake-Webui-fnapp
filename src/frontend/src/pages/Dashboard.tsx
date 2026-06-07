@@ -260,7 +260,7 @@ function Dashboard() {
 
                 <div className='pt-4 border-t border-dark-700'>
                   <a
-                    href='https://github.com/ray5378/HandBrake-Webui'
+                    href='https://github.com/ray5378/HaddBrake-Webui-fnapp'
                     target='_blank'
                     rel='noopener noreferrer'
                     className='inline-flex items-center space-x-2 text-primary hover:text-primary-light transition-colors'

@@ -88,7 +88,8 @@
     "diskUsage": "磁盘使用",
     "activeJobs": "进行中的任务",
     "noActiveJobs": "当前没有进行中的任务",
-    "settingsDesc": "缓存目录、线程数、通用设置"
+    "settingsDesc": "缓存目录、线程数、通用设置",
+    "starOnGitHub": "在 GitHub 上点赞"
   },
   "jobs": {
     "title": "任务",

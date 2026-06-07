@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Video, FolderOpen, ArrowRight, Layers, Settings } from 'lucide-react';
+import { Video, FolderOpen, ArrowRight, Layers, Settings, Star } from 'lucide-react';
 import api from '../services/api';
 import { formatFileSize, formatETA } from '../utils/format';
 import { SystemInfo, Job } from '../types';
@@ -256,6 +256,18 @@ function Dashboard() {
                     {Math.floor(systemInfo.uptime / 3600)} h{' '}
                     {Math.floor((systemInfo.uptime % 3600) / 60)} m
                   </p>
+                </div>
+
+                <div className='pt-4 border-t border-dark-700'>
+                  <a
+                    href='https://github.com/ray5378/HandBrake-Webui'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='inline-flex items-center space-x-2 text-primary hover:text-primary-light transition-colors'
+                  >
+                    <Star className='w-4 h-4' />
+                    <span>{t('dashboard.starOnGitHub', 'Star on GitHub')}</span>
+                  </a>
                 </div>
               </div>
             ) : (

@@ -5,13 +5,12 @@ IMAGE_NAME="ray5378/handbrake-webui-fnapp:${TRIM_APPVER:-latest}"
 start_container() {
   local vol_config="-v ${TRIM_PKGVAR}/config:/config"
 
-  # Mount each accessible path as a subdirectory under /drive
+  # Mount each accessible path directly at its original path
   if [ -n "${TRIM_DATA_ACCESSIBLE_PATHS}" ]; then
     IFS=':' read -ra PATHS <<< "${TRIM_DATA_ACCESSIBLE_PATHS}"
     for path in "${PATHS[@]}"; do
       if [ -n "$path" ] && [ -d "$path" ]; then
-        local subdir=$(basename "$path")
-        vol_config="$vol_config -v ${path}:/drive/${subdir}:ro"
+        vol_config="$vol_config -v ${path}:${path}:ro"
       fi
     done
   fi

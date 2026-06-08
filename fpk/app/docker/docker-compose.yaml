@@ -6,9 +6,11 @@ services:
     network_mode: host
     volumes:
       - ${TRIM_PKGVAR}/config:/config
-    environment:
-      - PORT=${TRIM_SERVICE_PORT}
-      - CONFIG_DIR=/config
-      - NODE_ENV=production
     devices:
       - /dev/dri:/dev/dri
+    environment:
+      - PORT=${TRIM_SERVICE_PORT:-52389}
+      - CONFIG_DIR=/config
+      - NODE_ENV=production
+      - TRIN_DATA_ACCESSIBLE_PATHS=${TRIM_DATA_ACCESSIBLE_PATHS:-}
+      - TRIN_APP_STATUS=${TRIM_APP_STATUS:-}

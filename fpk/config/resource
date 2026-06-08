@@ -1,1 +1,5 @@
-{}
+{
+  "docker-project": {
+    "compose-file": "app/docker/docker-compose.yaml"
+  }
+}

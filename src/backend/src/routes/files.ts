@@ -78,7 +78,19 @@ router.get(
 
           const itemPath = path.join(dirPath, item.name);
 
-          if (item.isDirectory()) {
+          // For symlinks, check the target to see if it's a directory
+          let isDir = item.isDirectory();
+          if (item.isSymbolicLink() && !isDir) {
+            try {
+              const stats = fs.statSync(itemPath);
+              isDir = stats.isDirectory();
+            } catch {
+              // Broken symlink, skip
+              continue;
+            }
+          }
+
+          if (isDir) {
             if (item.name.toLowerCase().includes(searchQuery)) {
               results.directories.push({
                 name: item.name,
@@ -156,7 +168,19 @@ router.get(
       for (const item of items) {
         const itemPath = path.join(directory, item.name);
 
-        if (item.isDirectory()) {
+        // For symlinks, check the target to see if it's a directory
+        let isDir = item.isDirectory();
+        if (item.isSymbolicLink() && !isDir) {
+          try {
+            const stats = fs.statSync(itemPath);
+            isDir = stats.isDirectory();
+          } catch {
+            // If symlink is broken, skip
+            continue;
+          }
+        }
+
+        if (isDir) {
           directories.push({
             name: item.name,
             path: itemPath,

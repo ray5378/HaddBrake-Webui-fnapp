@@ -69,7 +69,10 @@ jobs:
 
       - name: Package app.tgz
         run: |
-          mkdir -p fpk/app && tar -czf fpk/app.tgz -C fpk/app .
+          echo "Packaging fpk/app contents to fpk/app.tgz..."
+          ls -laR fpk/app/
+          cd fpk/app && tar -czf ../app.tgz .
+          cd .. && ls -lh app.tgz
 
       - name: Build fpk
         run: |

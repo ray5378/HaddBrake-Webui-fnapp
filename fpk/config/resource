@@ -1,2 +1,10 @@
 {
+  "docker-project": {
+    "projects": [
+      {
+        "name": "handbrake-webui",
+        "path": "docker"
+      }
+    ]
+  }
 }

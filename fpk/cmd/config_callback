@@ -1,23 +1,6 @@
 #!/bin/bash
 
-save_drive_path() {
-  local path="$1"
-  if [ -n "$path" ]; then
-    mkdir -p "${TRIM_PKGVAR}" 2>/dev/null || true
-    echo "$path" > "${TRIM_PKGVAR}/drive_path" 2>/dev/null || true
-  fi
-}
-
-local_path="${drive_path}"
-if [ -z "$local_path" ] && [ -f "${TRIM_PKGVAR}/drive_path" ]; then
-  local_path=$(cat "${TRIM_PKGVAR}/drive_path")
-fi
-if [ -z "$local_path" ] && [ -n "${TRIM_DATA_SHARE_PATHS}" ]; then
-  local_path="${TRIM_DATA_SHARE_PATHS%%:*}"
-fi
-
-save_drive_path "$local_path"
-
+# When accessible directories change, restart the container to remount
 CMD_DIR="$(dirname "$0")"
 "${CMD_DIR}/main" stop
 "${CMD_DIR}/main" start

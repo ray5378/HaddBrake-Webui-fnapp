@@ -1,16 +1,19 @@
 #!/bin/bash
 
-IMAGE_NAME="ray5378/handbrake-webui-fnapp:latest"
+IMAGE_NAME="ray5378/handbrake-webui-fnapp:${TRIM_APPVER:-latest}"
 
 start_container() {
-  local drive_path=""
-  if [ -f "${TRIM_PKGVAR}/drive_path" ]; then
-    drive_path=$(cat "${TRIM_PKGVAR}/drive_path")
-  fi
-
   local vol_config="-v ${TRIM_PKGVAR}/config:/config"
-  if [ -n "$drive_path" ]; then
-    vol_config="$vol_config -v ${drive_path}:/drive"
+
+  # Mount each accessible path as a subdirectory under /drive
+  if [ -n "${TRIM_DATA_ACCESSIBLE_PATHS}" ]; then
+    IFS=':' read -ra PATHS <<< "${TRIM_DATA_ACCESSIBLE_PATHS}"
+    for path in "${PATHS[@]}"; do
+      if [ -n "$path" ] && [ -d "$path" ]; then
+        local subdir=$(basename "$path")
+        vol_config="$vol_config -v ${path}:/drive/${subdir}:ro"
+      fi
+    done
   fi
 
   local dev_params=""
@@ -21,7 +24,6 @@ start_container() {
     --name handbrake-webui \
     --restart unless-stopped \
     --network host \
-    --pull always \
     $vol_config \
     -e PORT="${TRIM_SERVICE_PORT:-52389}" \
     -e CONFIG_DIR=/config \

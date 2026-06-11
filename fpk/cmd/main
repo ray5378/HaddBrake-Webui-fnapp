@@ -13,7 +13,7 @@ build_volumes() {
     IFS=':' read -ra PATHS <<< "${TRIM_DATA_ACCESSIBLE_PATHS}"
     for p in "${PATHS[@]}"; do
       if [ -n "$p" ] && [ -d "$p" ]; then
-        volumes="${volumes} -v ${p}:${p}:ro"
+        volumes="${volumes} -v ${p}:${p}"
       fi
     done
   fi

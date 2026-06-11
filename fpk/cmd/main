@@ -1,18 +1,60 @@
 #!/bin/bash
 
-PROJECT_DIR="$(dirname "$0")/.."
-COMPOSE_FILE="${PROJECT_DIR}/app/docker/docker-compose.yaml"
+CONTAINER_NAME="handbrake-webui"
+IMAGE_NAME="ray5378/handbrake-webui-fnapp:${TRIM_APPVER:-latest}"
+PORT="${TRIM_SERVICE_PORT:-52389}"
+CONFIG_DIR="${TRIM_PKGVAR}/config"
+
+# 构建 volume 参数
+build_volumes() {
+  local volumes=""
+  volumes="${volumes} -v ${CONFIG_DIR}:/config"
+  if [ -n "${TRIM_DATA_ACCESSIBLE_PATHS}" ]; then
+    IFS=':' read -ra PATHS <<< "${TRIM_DATA_ACCESSIBLE_PATHS}"
+    for p in "${PATHS[@]}"; do
+      if [ -n "$p" ] && [ -d "$p" ]; then
+        volumes="${volumes} -v ${p}:${p}:ro"
+      fi
+    done
+  fi
+  echo "${volumes}"
+}
 
 case $1 in
   start)
-    docker compose -f "${COMPOSE_FILE}" up -d || exit 1
+    # 先停止并删除旧容器
+    if docker ps -a | grep -q "${CONTAINER_NAME}"; then
+      docker stop "${CONTAINER_NAME}" >/dev/null 2>&1
+      docker rm "${CONTAINER_NAME}" >/dev/null 2>&1
+    fi
+
+    VOLUMES=$(build_volumes)
+
+    # 使用 docker run 启动
+    docker run -d \
+      --name "${CONTAINER_NAME}" \
+      --restart=unless-stopped \
+      --network=host \
+      ${VOLUMES} \
+      -e PORT="${PORT}" \
+      -e CONFIG_DIR="/config" \
+      -e NODE_ENV="production" \
+      -e TRIN_DATA_ACCESSIBLE_PATHS="${TRIM_DATA_ACCESSIBLE_PATHS:-}" \
+      -e TRIN_APP_STATUS="${TRIN_APP_STATUS:-}" \
+      --device /dev/dri:/dev/dri \
+      "${IMAGE_NAME}"
+
+    exit $?
     ;;
   stop)
-    docker compose -f "${COMPOSE_FILE}" down 2>/dev/null || true
+    if docker ps -a | grep -q "${CONTAINER_NAME}"; then
+      docker stop "${CONTAINER_NAME}" >/dev/null 2>&1
+      docker rm "${CONTAINER_NAME}" >/dev/null 2>&1
+    fi
     exit 0
     ;;
   status)
-    docker compose -f "${COMPOSE_FILE}" ps --status running 2>/dev/null | grep -q handbrake-webui || exit 3
+    docker ps | grep -q "${CONTAINER_NAME}" || exit 3
     exit 0
     ;;
   *)

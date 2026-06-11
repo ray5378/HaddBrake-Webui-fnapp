@@ -1,30 +1,7 @@
 #!/bin/bash
 
-# When accessible directories change, regenerate the compose override
-# with volume mounts for each accessible path, then restart the container.
+# 可访问路径变更时，直接重建容器（docker run 会自动带上最新的 TRIM_DATA_ACCESSIBLE_PATHS）
 CMD_DIR="$(dirname "$0")"
-OVERRIDE_FILE="${CMD_DIR}/../app/docker/docker-compose.override.yaml"
-
-# Generate override with accessible path volumes
-if [ -n "${TRIM_DATA_ACCESSIBLE_PATHS}" ]; then
-  IFS=':' read -ra PATHS <<< "${TRIM_DATA_ACCESSIBLE_PATHS}"
-  VOLUMES=""
-  for p in "${PATHS[@]}"; do
-    if [ -n "$p" ] && [ -d "$p" ]; then
-      VOLUMES="${VOLUMES}
-      - ${p}:${p}:ro"
-    fi
-  done
-
-  cat > "${OVERRIDE_FILE}" << EOF
-services:
-  handbrake-webui:
-    volumes:${VOLUMES}
-EOF
-else
-  rm -f "${OVERRIDE_FILE}"
-fi
-
 "${CMD_DIR}/main" stop
 "${CMD_DIR}/main" start || exit 1
 
